@@ -1,19 +1,25 @@
 const express = require("express")
+// Middleware to connect express
 const cors = require('cors')
+// For database
 const mongoose = require("mongoose")
 const User = require("./models/User")
+// To encrypt 
 const bcrypt = require('bcryptjs');
 const app = express();
 
 const salt = bcrypt.genSaltSync(10);
 const secret ='dkjedjedbsywhs2w92w2o2292o1019w2o1019'
-// y4XdFdfBh654WuRm
-// mongodb+srv://prabhupurvi:y4XdFdfBh654WuRm@cluster0.eezgwzc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
 app.use(cors({credentials:true,origin:'http://localhost:3000'}))
 app.use(express.json())
 const jwt = require('jsonwebtoken')
+// Database connection
+// y4XdFdfBh654WuRm
+// mongodb+srv://prabhupurvi:y4XdFdfBh654WuRm@cluster0.eezgwzc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 mongoose.connect('mongodb+srv://prabhupurvi:y4XdFdfBh654WuRm@cluster0.eezgwzc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 
+// Register 
 app.post('/register',async (req,res)=>{
     const {username,password} = req.body
     try{
@@ -25,6 +31,7 @@ app.post('/register',async (req,res)=>{
     }
 })
 
+// Login
 app.post('/login',async (req,res)=>{
     const {username,password} = req.body
     const UserDoc = await User.findOne({username})
@@ -39,4 +46,6 @@ app.post('/login',async (req,res)=>{
         res.status(400).json('Wrong credentials')
     }
 })
+
+
 app.listen(4000)
