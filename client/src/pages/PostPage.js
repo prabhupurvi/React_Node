@@ -24,7 +24,7 @@ export default function PostPage(){
         <div className="author">by @{postInfo.author.username}</div>
         {userInfo.id === postInfo.author._id && (
         <div className="edit-row">
-          <Link to={`edit/${postInfo._id}`} className="edit-btn" href="">
+          <Link to={`/edit/${postInfo._id}`} className="edit-btn" href="">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

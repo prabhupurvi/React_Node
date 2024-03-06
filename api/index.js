@@ -112,4 +112,33 @@ app.get('/post/:id', async (req, res)=>{
 
 })
 
+app.put('/post/:id', uploadMiddleware.single("file"), async (req, res)=>{
+    let newPath = null
+    if(req.file){
+        const {originalname,path} = req.file
+        const parts = originalname.split('.')
+        const ext = parts[parts.length-1];
+        newPath = `${path}.${ext}`
+        fs.renameSync(path,newPath)
+    }
+
+    const {token} = req.cookies
+    jwt.verify(token,secret,{},async (err,info)=>{
+        console.log(info)
+        if(err) throw err
+        const{id,title,summary,content} = req.body
+        const postDoc = await Post.findById(id)
+        const isAuthor =  JSON.stringify(postDoc.author) === JSON.stringify(info.id)
+        if(!isAuthor){
+            return  response.status(404).json('You are not the author')
+            // throw 'You are not the author'
+        } 
+        await postDoc.update({title,
+            summary,
+            content,
+            cover:newPath?newPath:postDoc.cover})
+        res.json(postDoc)
+    })
+})
+
 app.listen(4000)
