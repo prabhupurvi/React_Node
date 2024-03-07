@@ -4,7 +4,7 @@ import Editor from "../Editor"
 
 
 export default function EditPost(){
-    const {id} =useParams()
+    const {id} = useParams()
     const [title, setTitle] = useState("")
     const [summary, setSummary] = useState("")
     const [content, setContent] = useState("")
@@ -32,7 +32,7 @@ export default function EditPost(){
         if(files?.[0]){
             data.set('file', files?.[0]);
         }
-        const response = await fetch(`http:localhost:4000/post`,{
+        const response = await fetch(`http://localhost:4000/post`,{
             method:'PUT',
             body: data,
             credentials:'include'

@@ -18,7 +18,7 @@ export default function Header(){
   const username = userInfo?.username
     return (
         <header>
-        <a href="" className="logo">MyBlog</a>
+        <Link to="/" className="logo">MyBlog</Link>
         <nav>
           {username && (<>
           <Link to='/create'>Create New Post</Link>
