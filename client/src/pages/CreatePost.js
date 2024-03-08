@@ -25,11 +25,7 @@ export default function CreatePost(){
             setRedirect(true)
         }
     }
-
-    // function setContent(){
-
-    // }
-
+    
     if(redirect){
         return <Navigate to={"/"}/>
     }

@@ -157,3 +157,22 @@ div.post-page a.edit-btn{
 a svg{
     height: 20px;
 }
+
+div.comment{
+    display:flex;
+    justify-content: start;
+    gap:5px;
+}
+
+div.commentContainer{
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+div.commentContainer button{
+    width:100px;
+}
+
+div.post-page div.addedComments{
+    margin-top: 10px;;
+}

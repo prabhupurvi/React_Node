@@ -5,24 +5,42 @@ import { UserContext } from "../UserContext"
 
 export default function PostPage(){
     const [postInfo,setPostInfo] = useState(null)
+    const [comment,setComment] = useState("")
     const {userInfo} = useContext(UserContext)
     const {id} = useParams()
     useEffect(() =>{
-        
         fetch(`http://localhost:4000/post/${id}`)
         .then((response) =>{
-            response.json().then(postInfo=>{
+            response?.json().then(postInfo=>{
                 setPostInfo(postInfo)
             })
         })
-    },[])
+    })
+
+    async function addComment(e){ 
+      e.preventDefault() ;
+      if(comment !== ""){
+      const data = new FormData();
+      data.set('comment',comment);
+      data.set('id',id)
+      data.set('username',userInfo.username)
+      const response = await fetch("http://localhost:4000/comment",{
+            method:"POST",
+            body: JSON.stringify({id,username:userInfo.username,comment}),
+            headers:{"Content-Type":'application/json'},
+            credentials:'include'
+        })
+        setComment("")
+      }
+    }
+
     if (!postInfo) return ''
     return (
       <div className="post-page">
         <h1>{postInfo.title}</h1>
         <time>{formatISO9075(new Date(postInfo.createdAt))}</time>
         <div className="author">by @{postInfo.author.username}</div>
-        {userInfo.id === postInfo.author._id && (
+        {userInfo?.id === postInfo.author._id && (
         <div className="edit-row">
           <Link to={`/edit/${postInfo._id}`} className="edit-btn" href="">
             <svg
@@ -50,6 +68,25 @@ export default function PostPage(){
           className="content"
           dangerouslySetInnerHTML={{ __html: postInfo.content }}
         />
+        {userInfo?.username && 
+        <form onSubmit={addComment}>
+          <div className="commentContainer">
+              <p>Add Comment: </p>
+            <div className="comment">
+              <textarea cols={100} rows={2} onChange={e=>setComment(e.target.value)} value={comment}></textarea>
+              <button>Post</button>
+            </div>
+          </div>
+        </form>}
+        <p style={{color:"red",fontWeight:"bold", display:"inline"}}>Comments: </p>
+        {postInfo.comments.length > 0 ? 
+        
+        postInfo?.comments?.map((item)=>{
+          return (<div className="addedComments">
+           <span style={{fontWeight:"bold"}}> {item.username}</span>  : <div>{item.comment}</div>
+          </div>)
+        }):<p style={{display:"inline"}}>No comments </p>}
+        
       </div>
     );
 }

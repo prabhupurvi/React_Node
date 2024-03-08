@@ -54,7 +54,7 @@ app.post("/login", async (req, res) => {
   );
   if (passOk) {
     // Logged in
-    jwt.sign({ username, id: UserDoc._id }, secret, {}, (err, token) => {
+    jwt.sign({ username, id: UserDoc?._id }, secret, {}, (err, token) => {
       if (err) throw err;
       res.cookie("token", token).json({
         id: UserDoc._id,
@@ -90,7 +90,6 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
 
   const { token } = req.cookies;
   jwt.verify(token, secret, {}, async (err, info) => {
-    console.log(info);
     if (err) throw err;
     const { title, summary, content } = req.body;
     const postDoc = await Post.create({
@@ -98,7 +97,7 @@ app.post("/post", uploadMiddleware.single("file"), async (req, res) => {
       summary,
       content,
       cover: newPath,
-      author: info.id,
+      author: info?.id,
     });
     res.json(postDoc);
   });
@@ -134,7 +133,7 @@ app.put("/post", uploadMiddleware.single("file"), async (req, res) => {
     if (err) throw err;
     const { id, title, summary, content } = req.body;
     let postDoc = await Post.findById(id);
-    const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info.id);
+    const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(info?.id);
     if (!isAuthor) {
       return res.status(404).json("You are not the author");
     }
@@ -144,8 +143,27 @@ app.put("/post", uploadMiddleware.single("file"), async (req, res) => {
       content,
       cover: newPath ? newPath : postDoc.cover,
     });
+    
     res.json(postDoc)
   });
 });
 
+app.post('/comment', async (req, res) => {
+  const { token } = req.cookies;
+  jwt.verify(token, secret, {}, async (err, info) => {
+    if (err) throw err;
+    const { comment, id,username } = req.body;
+    let postDoc = await Post.findById(id);
+    const {title, summary, content, cover, comments} = postDoc
+    await postDoc.updateOne({
+      title,
+      summary,
+      content,
+      cover,
+      comments:[...comments,{username,comment}]
+    })
+    res.json(postDoc)
+  })
+  
+})
 app.listen(4000);
